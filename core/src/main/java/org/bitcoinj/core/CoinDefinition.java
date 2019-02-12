@@ -46,9 +46,9 @@ public class CoinDefinition {
     enum CoinHash {
         SHA256,
         scrypt,
-        x11
+        x16r
     };
-    public static final CoinHash coinPOWHash = CoinHash.x11;
+    public static final CoinHash coinPOWHash = CoinHash.x16r;
 
     public static boolean checkpointFileSupport = true;
 

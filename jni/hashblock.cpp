@@ -8,7 +8,7 @@
 
 
 
-jbyteArray JNICALL hash11_native(JNIEnv *env, jclass cls, jbyteArray header)
+jbyteArray JNICALL hash16_native(JNIEnv *env, jclass cls, jbyteArray header)
 {
     jint Plen = (env)->GetArrayLength(header);
     jbyte *P = (env)->GetByteArrayElements(header, NULL);
@@ -17,8 +17,7 @@ jbyteArray JNICALL hash11_native(JNIEnv *env, jclass cls, jbyteArray header)
 
     if (P)
 	{
-	
-	uint256 result = Hash9(P, P+Plen);
+	  uint256 result = HashX16R(P, P+Plen);
 
     /*if (crypto_scrypt((uint8_t *) P, Plen, (uint8_t *) S, Slen, N, r, p, buf, dkLen)) {
         jclass e = (*env)->FindClass(env, "java/lang/IllegalArgumentException");
@@ -38,21 +37,21 @@ jbyteArray JNICALL hash11_native(JNIEnv *env, jclass cls, jbyteArray header)
         goto cleanup;
     }*/
 
-    DK = (env)->NewByteArray(32);
-    if (DK)
-	{
-		(env)->SetByteArrayRegion(DK, 0, 32, (jbyte *) result.begin());
-	}
+	  DK = (env)->NewByteArray(32);
+	  if (DK)
+	    {
+	      (env)->SetByteArrayRegion(DK, 0, 32, (jbyte *) result.begin());
+	    }
 	
 
-    if (P) (env)->ReleaseByteArrayElements(header, P, JNI_ABORT);
-    //if (buf) free(buf);
+	  if (P) (env)->ReleaseByteArrayElements(header, P, JNI_ABORT);
+	  //if (buf) free(buf);
 	}
     return DK;
 }
 
 static const JNINativeMethod methods[] = {
-    { "x11_native", "([B)[B", (void *) hash11_native }
+    { "x16r_native", "([B)[B", (void *) hash16_native }
 };
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
@@ -62,7 +61,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return -1;
     }
 
-    jclass cls = (env)->FindClass("com/hashengineering/crypto/X11");
+    jclass cls = (env)->FindClass("com/hashengineering/crypto/X16R");
     int r = (env)->RegisterNatives(cls, methods, 1);
 
     return (r == JNI_OK) ? JNI_VERSION_1_6 : -1;
