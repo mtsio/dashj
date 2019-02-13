@@ -21,6 +21,7 @@ import com.google.common.annotations.*;
 import com.google.common.base.*;
 import com.google.common.collect.*;
 import com.hashengineering.crypto.X11;
+import com.hashengineering.crypto.X16R;
 import org.bitcoinj.script.*;
 import org.slf4j.*;
 
@@ -320,8 +321,8 @@ public class Block extends Message {
         time = readUint32();
         difficultyTarget = readUint32();
         nonce = readUint32();
-        hash = Sha256Hash.wrapReversed(X11.x11Digest(payload, offset,
-						     cursor - offset));
+        hash = Sha256Hash.wrapReversed(X16R.x16rDigest(payload, offset,
+						       cursor - offset));
         headerBytesValid = serializer.isParseRetainMode();
 
         // transactions
@@ -466,7 +467,7 @@ public class Block extends Message {
         try {
             ByteArrayOutputStream bos = new UnsafeByteArrayOutputStream(HEADER_SIZE);
             writeHeader(bos);
-            return Sha256Hash.wrapReversed(X11.x11Digest(bos.toByteArray()));
+            return Sha256Hash.wrapReversed(X16R.x16rDigest(bos.toByteArray()));
         } catch (IOException e) {
             throw new RuntimeException(e); // Cannot happen.
         }
