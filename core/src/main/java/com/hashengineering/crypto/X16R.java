@@ -1,10 +1,10 @@
 package com.hashengineering.crypto;
 
 import org.bitcoinj.core.Sha256Hash;
-
 import fr.cryptohash.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.hashengineering.crypto.X11;
 
 public class X16R {
     private static final Logger log = LoggerFactory.getLogger(X16R.class);
@@ -44,7 +44,8 @@ public class X16R {
     public static byte[] x16rDigest(byte[] input) {
         //long start = System.currentTimeMillis();
         try {
-            return x16r_native(input);
+	    if (native_library_loaded) return x16r_native(input);
+	    else return X11.x11(input);
         
 	} catch (Exception e) {
             return null;
