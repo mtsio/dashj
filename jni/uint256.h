@@ -11,6 +11,7 @@
 #include <inttypes.h>
 #include <string>
 #include <vector>
+#include "utilstrencodings.h"
 
 typedef long long  int64;
 typedef unsigned long long  uint64;
@@ -27,8 +28,8 @@ template<unsigned int BITS>
 class base_uint
 {
 protected:
-    enum { WIDTH=BITS/32 };
-    uint32_t pn[WIDTH];
+    enum { WIDTH=BITS/8 };
+    uint8_t pn[WIDTH];
 public:
 
     bool operator!() const
@@ -303,42 +304,39 @@ public:
         return std::string(psz, psz + sizeof(pn)*2);
     }
 
-    /*void SetHex(const char* psz)
+    void SetHex(const char* psz)
     {
-        for (int i = 0; i < WIDTH; i++)
-            pn[i] = 0;
+        memset(pn, 0, sizeof(pn));
 
-        // skip leading spaces
-        while (isspace(*psz))
-            psz++;
+	// skip leading spaces
+	while (isspace(*psz))
+	    psz++;
 
-        // skip 0x
-        if (psz[0] == '0' && tolower(psz[1]) == 'x')
-            psz += 2;
+	// skip 0x
+	if (psz[0] == '0' && tolower(psz[1]) == 'x')
+	    psz += 2;
 
-        // hex string to uint
-        static const unsigned char phexdigit[256] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0, 0,0xa,0xb,0xc,0xd,0xe,0xf,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0xa,0xb,0xc,0xd,0xe,0xf,0,0,0,0,0,0,0,0,0 };
-        const char* pbegin = psz;
-        while (phexdigit[(unsigned char)*psz] || *psz == '0')
-            psz++;
-        psz--;
-        unsigned char* p1 = (unsigned char*)pn;
-        unsigned char* pend = p1 + WIDTH * 4;
-        while (psz >= pbegin && p1 < pend)
-        {
-            *p1 = phexdigit[(unsigned char)*psz--];
-            if (psz >= pbegin)
-            {
-                *p1 |= (phexdigit[(unsigned char)*psz--] << 4);
-                p1++;
-            }
-        }
+	// hex string to uint
+	const char* pbegin = psz;
+	while (::HexDigit(*psz) != -1)
+	    psz++;
+	psz--;
+	unsigned char* p1 = (unsigned char*)pn;
+	unsigned char* pend = p1 + WIDTH;
+	while (psz >= pbegin && p1 < pend) {
+  	    *p1 = ::HexDigit(*psz--);
+	    if (psz >= pbegin) {
+   	        *p1 |= ((unsigned char)::HexDigit(*psz--) << 4);
+		p1++;
+	    }
+	}
+
     }
 
     void SetHex(const std::string& str)
     {
         SetHex(str.c_str());
-    }*/
+    }
 
     std::string ToString() const
     {
@@ -551,6 +549,15 @@ public:
         for (int i = 0; i < WIDTH; i++)
             pn[i] = b.pn[i];
     }
+  
+  int GetNibble(int index) const 
+  {
+      index = 63 - index;
+      if (index % 2 == 1)
+          return (pn[index / 2] >> 4);
+      return (pn[index / 2] & 0x0F); 
+  }
+
 
     uint256& operator=(const basetype& b)
     {

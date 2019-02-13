@@ -150,20 +150,18 @@ int GetNibble(const uint8_t *data, int index)
     return(data[index / 2] & 0x0F);
 }
 
-inline int GetHashSelection(const uint8_t *PrevBlockHash, int index) {
+inline int GetHashSelection(const uint256 PrevBlockHash, int index) {
   assert(index >= 0);
   assert(index < 16);
 
 #define START_OF_LAST_16_NIBBLES_OF_HASH 48
-  int hashSelection = GetNibble(PrevBlockHash,
-				START_OF_LAST_16_NIBBLES_OF_HASH + index);
+  int hashSelection = PrevBlockHash.GetNibble(START_OF_LAST_16_NIBBLES_OF_HASH + index);
   return (hashSelection);
 }
 
 template<typename T1>
 inline uint256 HashX16R(const T1 pbegin, const T1 pend)
 {
-  //	static std::chrono::duration<double>[16];
   int hashSelection;
 
   sph_blake512_context     ctx_blake;       //0
@@ -184,7 +182,7 @@ inline uint256 HashX16R(const T1 pbegin, const T1 pend)
   sph_sha512_context       ctx_sha512;      //F
 
   static unsigned char pblank[1];
-  const uint8_t *PrevBlockHash = (uint8_t*) &(pbegin[4]);
+  const uint256 PrevBlockHash = pbegin[4];
   uint512 hash[16];
   
   for (int i = 0; i < 16; i++) 
@@ -201,7 +199,7 @@ inline uint256 HashX16R(const T1 pbegin, const T1 pend)
 	lenToHash = 64;
       }
 
-      // hashSelection = GetHashSelection(PrevBlockHash, i);
+      hashSelection = GetHashSelection(PrevBlockHash, i);
       switch (hashSelection) {
       case 0:
 	sph_blake512_init(&ctx_blake);

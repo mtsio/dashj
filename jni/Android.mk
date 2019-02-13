@@ -27,7 +27,7 @@ include $(CLEAR_VARS)
 LOCAL_C_INCLUDES := sources/include
 
 LOCAL_MODULE    := x16r
-LOCAL_SRC_FILES := hashblock.cpp blake.c bmw.c groestl.c jh.c keccak.c skein.c cubehash.c echo.c luffa.c shavite.c simd.c hamsi.c fugue.c shabal.c whirlpool.c
+LOCAL_SRC_FILES := hashblock.cpp blake.c bmw.c groestl.c jh.c keccak.c skein.c cubehash.c echo.c luffa.c shavite.c simd.c hamsi.c fugue.c shabal.c whirlpool.c sha2big.c
 
 include $(BUILD_SHARED_LIBRARY)
 
